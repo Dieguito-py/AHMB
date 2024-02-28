@@ -1,38 +1,32 @@
-from flask import Flask, render_template, request
-import matplotlib.pyplot as plt
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from datetime import datetime
+from urllib.parse import parse_qs
 
-app = Flask(__name__)
+PORT = 8080
 
-x_data, y_data, z_data = [], [], []
+class RequestHandler(BaseHTTPRequestHandler):
+    def do_POST(self):
+        content_length = int(self.headers['Content-Length'])
+        post_data = self.rfile.read(content_length)
+        data_str = post_data.decode("utf-8")
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+        now = datetime.now()
+        date_time = now.strftime("%Y-%m-%d %H:%M:%S")
 
-@app.route('/data', methods=['POST'])
-def receive_data():
-    data = request.data.decode('utf-8')
-    if data:
-        ax, ay, az = map(float, data.split(','))
-        x_data.append(ax)
-        y_data.append(ay)
-        z_data.append(az)
-        print(f"Received data: X={ax}, Y={ay}, Z={az}")
-    return 'Data received'
+        # Salvar os dados 
+        with open('dados.csv', 'a') as file:
+            file.write(f'{date_time},{data_str}\n')
 
-@app.route('/plot')
-def plot_data():
-    plt.figure(figsize=(8, 6))
-    plt.plot(x_data, label='X')
-    plt.plot(y_data, label='Y')
-    plt.plot(z_data, label='Z')
-    plt.xlabel('Samples')
-    plt.ylabel('Accelerometer Values')
-    plt.legend()
-    plt.title('MPU6050 Accelerometer Data')
-    plt.savefig('static/plot.png')  # Salva o gráfico como um arquivo estático
-    plt.close()
-    return render_template('plot.html')
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        self.wfile.write(bytes("Dados recebidos com sucesso!", 'utf-8'))
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    try:
+        server = HTTPServer(('0.0.0.0', PORT), RequestHandler)
+        print(f'Servidor rodando na porta {PORT}')
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print('^C received, shutting down the server')
+        server.socket.close()
