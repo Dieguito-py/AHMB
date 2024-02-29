@@ -9,7 +9,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         content_length = int(self.headers['Content-Length'])
         post_data = self.rfile.read(content_length)
         data_str = post_data.decode("utf-8")
-
+        
         now = datetime.now()
         date_time = now.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -21,6 +21,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'text/html')
         self.end_headers()
         self.wfile.write(bytes("Dados recebidos com sucesso!", 'utf-8'))
+        print(data_str)
 
 if __name__ == "__main__":
     try:
