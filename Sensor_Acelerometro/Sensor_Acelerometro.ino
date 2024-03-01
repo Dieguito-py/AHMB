@@ -14,7 +14,8 @@ const float ACCEL_MAX = 2.0;
 void setup() {
   Serial.begin(115200);
   Wire.begin();
-
+  Wire.write(0x6B); // Endereço do registrador para controle de energia
+  Wire.write(0x00); 
   // Conectar-se à rede WiFi
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -73,8 +74,8 @@ void sendDataToServer(float x, float y, float z) {
     client.print("\r\n\r\n");
     client.print(dataString);
 
-    Serial.println("Dados enviados para o servidor");
-
+    Serial.println("\n Dados enviados para o servidor");
+    Serial.print(dataString);
     // Aguardar a resposta do servidor (opcional)
     while (client.available()) {
       String line = client.readStringUntil('\r');
