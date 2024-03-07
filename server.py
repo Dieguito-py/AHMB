@@ -2,7 +2,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from datetime import datetime
 from urllib.parse import parse_qs
 
-PORT = 8080
+PORT = 80
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_POST(self):
