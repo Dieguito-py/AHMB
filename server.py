@@ -1,6 +1,12 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from datetime import datetime
 from urllib.parse import parse_qs
+import threading
+
+print("[1] Repousando\n[2] Digitando\n[3] Escrevendo\n")
+
+atv = int(input("Atividade: "))
+time = float(input("Tempo de atividade: "))
 
 PORT = 80
 
@@ -15,7 +21,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         # Salvar os dados 
         with open('dados.csv', 'a') as file:
-            file.write(f'{date_time},{data_str}\n')
+            file.write(f'{date_time},{data_str},{atv}\n')
 
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
@@ -23,10 +29,18 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(bytes("Dados recebidos com sucesso!", 'utf-8'))
         print(data_str)
 
+def shutdown_server(server):
+    print("Encerrando o servidor...")
+    server.shutdown()
+
 if __name__ == "__main__":
     try:
         server = HTTPServer(('0.0.0.0', PORT), RequestHandler)
         print(f'Servidor rodando na porta {PORT}')
+
+        shutdown_timer = threading.Timer(time, shutdown_server, args=[server])
+        shutdown_timer.start()
+
         server.serve_forever()
     except KeyboardInterrupt:
         print('^C received, shutting down the server')
