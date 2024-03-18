@@ -11,4 +11,10 @@ sns.boxplot(x='service', y='xaxle', data=dados)
 plt.xlabel('Service')
 plt.ylabel('X Axle')
 # plt.title('Boxplot de X Axle por Service')
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(x='service', y='yaxle', data=dados)
+plt.xlabel('Service')
+plt.ylabel('X Axle')
+
 plt.show()
